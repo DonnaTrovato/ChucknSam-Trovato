@@ -23,7 +23,6 @@ async function loadDriveFiles() {
     gallery.appendChild(item);
   });
 }
-
 function openLightbox(file) {
   const lightbox = document.getElementById("lightbox");
   const content = document.getElementById("lightbox-content");
@@ -47,6 +46,8 @@ function openLightbox(file) {
 
   downloadBtn.href = file.webContentLink;
 }
+
+
 
 document.getElementById("lightbox-close").onclick = () => {
   document.getElementById("lightbox").classList.add("hidden");
