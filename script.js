@@ -1,64 +1,55 @@
-// Lightbox logic
-const lightbox = document.getElementById("lightbox");
-const lightboxClose = document.getElementById("lightboxClose");
-const mediaContainer = document.getElementById("lightboxMediaContainer");
-const downloadLink = document.getElementById("downloadLink");
+const API_KEY = "PASTE_YOUR_REGENERATED_KEY_HERE";
+const FOLDER_ID = "1WDhCqyQKCMtg-Y9RRWca6Z1VS-USCCmq";
 
-document.querySelectorAll(".gallery-item").forEach((item) => {
-  item.addEventListener("click", () => {
-    const type = item.dataset.type;
-    const src = item.dataset.src;
+async function loadDriveFiles() {
+  const url =
+    `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType,thumbnailLink,webContentLink)`;
 
-    mediaContainer.innerHTML = "";
+  const response = await fetch(url);
+  const data = await response.json();
 
-    if (type === "image") {
-      const img = document.createElement("img");
-      img.src = src;
-      img.alt = "Wedding media";
-      mediaContainer.appendChild(img);
-    } else if (type === "video") {
-      const video = document.createElement("video");
-      video.src = src;
-      video.controls = true;
-      video.autoplay = true;
-      mediaContainer.appendChild(video);
-    }
+  const gallery = document.getElementById("gallery");
 
-    downloadLink.href = src;
-    lightbox.classList.add("active");
+  data.files.forEach(file => {
+    const isVideo = file.mimeType.includes("video");
+    const thumb = file.thumbnailLink || "";
+
+    const item = document.createElement("img");
+    item.src = thumb;
+    item.className = "gallery-item";
+
+    item.onclick = () => openLightbox(file);
+
+    gallery.appendChild(item);
   });
-});
+}
 
-lightboxClose.addEventListener("click", () => {
-  lightbox.classList.remove("active");
-  mediaContainer.innerHTML = "";
-});
+function openLightbox(file) {
+  const lightbox = document.getElementById("lightbox");
+  const content = document.getElementById("lightbox-content");
+  const downloadBtn = document.getElementById("download-btn");
 
-lightbox.addEventListener("click", (e) => {
-  if (e.target === lightbox || e.target.classList.contains("lightbox-backdrop")) {
-    lightbox.classList.remove("active");
-    mediaContainer.innerHTML = "";
+  lightbox.classList.remove("hidden");
+  content.innerHTML = "";
+
+  const isVideo = file.mimeType.includes("video");
+
+  if (isVideo) {
+    const video = document.createElement("video");
+    video.src = file.webContentLink;
+    video.controls = true;
+    content.appendChild(video);
+  } else {
+    const img = document.createElement("img");
+    img.src = file.webContentLink;
+    content.appendChild(img);
   }
-});
 
-// Request access form -> mailto
-const requestForm = document.getElementById("requestForm");
+  downloadBtn.href = file.webContentLink;
+}
 
-requestForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const formData = new FormData(requestForm);
-  const name = formData.get("name");
-  const email = formData.get("email");
-  const message = formData.get("message");
+document.getElementById("lightbox-close").onclick = () => {
+  document.getElementById("lightbox").classList.add("hidden");
+};
 
-  // TODO: replace with your real email address
-  const to = "youremail@example.com";
-
-  const subject = encodeURIComponent("Wedding Gallery Access Request");
-  const body = encodeURIComponent(
-    `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
-  );
-
-  const mailtoUrl = `mailto:${to}?subject=${subject}&body=${body}`;
-  window.location.href = mailtoUrl;
-});
+loadDriveFiles();
