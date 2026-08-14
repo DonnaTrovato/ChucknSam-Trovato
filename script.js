@@ -36,12 +36,12 @@ function openLightbox(file) {
 
   if (isVideo) {
     const video = document.createElement("video");
-    video.src = file.webContentLink;
+    video.src = `https://drive.google.com/uc?export=download&id=${file.id}`;
     video.controls = true;
     content.appendChild(video);
   } else {
     const img = document.createElement("img");
-    img.src = file.webContentLink;
+    img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
     content.appendChild(img);
   }
 
