@@ -12,7 +12,7 @@ async function loadDriveFiles() {
 
   data.files.forEach(file => {
     const isVideo = file.mimeType.includes("video");
-    const thumb = file.thumbnailLink || "";
+    const thumb = file.thumbnailLink || file.webContentLink;
 
     const item = document.createElement("img");
     item.src = thumb;
