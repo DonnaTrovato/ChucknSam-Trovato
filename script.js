@@ -8,7 +8,7 @@ async function loadDriveFiles() {
   const response = await fetch(url);
   const data = await response.json();
 
-  const gallery = document.getElementById("gallery");
+  const gallery = document.getElementById("galleryGrid");
 
   data.files.forEach(file => {
     const isVideo = file.mimeType.includes("video");
