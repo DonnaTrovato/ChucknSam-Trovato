@@ -1,4 +1,4 @@
-const API_KEY = "PASTE_YOUR_REGENERATED_KEY_HERE";
+const API_KEY = "AIzaSyCRadR3Kb12_d-SVAnrwlgd7_Q-fnsE4nc";
 const FOLDER_ID = "1WDhCqyQKCMtg-Y9RRWca6Z1VS-USCCmq";
 
 async function loadDriveFiles() {
