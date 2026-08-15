@@ -11,7 +11,7 @@ async function loadDriveFiles() {
   const gallery = document.getElementById("galleryGrid");
 
   data.files.forEach(file => {
-    const isVideo = file.mimeType.includes("video");
+    const isVideo = file.mimeType.startsWith("video") || file.name.match(/\.(mp4|mov|m4v|avi|webm)$/i);
     const thumb = file.thumbnailLink || file.webContentLink;
 
     const item = document.createElement("img");
