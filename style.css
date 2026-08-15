@@ -100,7 +100,7 @@ section h2 {
 }
 
 /* -------------------------------------- */
-/* ⭐ UPDATED GALLERY WITH DOWNLOAD BUTTON */
+/* ⭐ GALLERY */
 /* -------------------------------------- */
 
 .gallery-grid {
@@ -108,12 +108,6 @@ section h2 {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
   margin-top: 15px;
-}
-
-.gallery-item-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .gallery-item {
@@ -132,36 +126,60 @@ section h2 {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Download button */
+/* -------------------------------------- */
+/* ⭐ LIGHTBOX (VIDEOS ONLY) */
+/* -------------------------------------- */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.lightbox.hidden {
+  display: none;
+}
+
+.lightbox-content {
+  max-width: 90%;
+  max-height: 70vh;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.lightbox-content video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
 
 .download-btn {
-  margin-top: 8px;
-  font-size: 0.85rem;
-  color: var(--accent);
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #ffffff;
+  color: #000;
+  border-radius: 6px;
   text-decoration: none;
-  font-weight: 500;
-}
-
-.download-btn:hover {
-  text-decoration: underline;
-}
-
-/* -------------------------------------- */
-/* Remove old lightbox styles (unused now) */
-/* -------------------------------------- */
-
-.lightbox,
-.lightbox.active,
-.lightbox-backdrop,
-.lightbox-content,
-.lightbox-close,
-#lightboxMediaContainer img,
-#lightboxMediaContainer video,
-.lightbox-actions,
-.hidden,
-#lightbox-close,
-#lightbox-content {
-  display: none !important;
+  font-weight: bold;
+  display: inline-block;
+  text-align: center;
 }
 
 /* -------------------------------------- */
