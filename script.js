@@ -3,7 +3,7 @@ const FOLDER_ID = "1WDhCqyQKCMtg-Y9RRWca6Z1VS-USCCmq";
 
 async function loadDriveFiles() {
   const url =
-    `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType,thumbnailLink,webContentLink)`;
+    `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType,thumbnailLink,webContentLink,webViewLink)`;
 
   const response = await fetch(url);
   const data = await response.json();
@@ -35,12 +35,13 @@ function openLightbox(file) {
 
   if (isVideo) {
     const video = document.createElement("video");
-    video.src = `https://drive.google.com/uc?export=download&id=${file.id}`;
+    video.src = file.webViewLink || `https://drive.google.com/uc?export=download&id=${file.id}`;
     video.controls = true;
     content.appendChild(video);
   } else {
     const img = document.createElement("img");
-    img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
+    img.src = file.webViewLink || `https://drive.google.com/uc?export=view&id=${file.id}`;
+
     content.appendChild(img);
   }
 
