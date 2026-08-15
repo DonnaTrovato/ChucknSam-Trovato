@@ -3,7 +3,7 @@ const FOLDER_ID = "1WDhCqyQKCMtg-Y9RRWca6Z1VS-USCCmq";
 
 async function loadDriveFiles() {
   const url =
-    `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType,thumbnailLink,webContentLink,webViewLink)`;
+    `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType,thumbnailLink,webContentLink)`;
 
   const response = await fetch(url);
   const data = await response.json();
@@ -12,41 +12,48 @@ async function loadDriveFiles() {
 
   data.files.forEach(file => {
     const isVideo = file.mimeType.includes("video");
-
-    // Thumbnail fallback
     const thumb = file.thumbnailLink || file.webContentLink;
 
-    // Wrapper for each gallery item
-    const wrapper = document.createElement("div");
-    wrapper.className = "gallery-item-wrapper";
-
-    // Thumbnail image
     const item = document.createElement("img");
     item.src = thumb;
     item.className = "gallery-item";
 
-    // Click to open file
+    // ⭐ HYBRID OPTION C:
+    // Images → open in new tab
+    // Videos → open in lightbox
     item.onclick = () => {
-      const url = isVideo
-        ? `https://drive.google.com/uc?export=download&id=${file.id}`
-        : `https://drive.google.com/uc?export=view&id=${file.id}`;
-
-      window.open(url, "_blank");
+      if (isVideo) {
+        openLightbox(file);   // videos play inline on mobile
+      } else {
+        const url = `https://drive.google.com/uc?export=view&id=${file.id}`;
+        window.open(url, "_blank");   // images open fast in new tab
+      }
     };
 
-    // Download button
-    const downloadBtn = document.createElement("a");
-    downloadBtn.className = "download-btn";
-    downloadBtn.innerText = "Download";
-    downloadBtn.href = `https://drive.google.com/uc?export=download&id=${file.id}`;
-    downloadBtn.target = "_blank";
-
-    // Build item
-    wrapper.appendChild(item);
-    wrapper.appendChild(downloadBtn);
-    gallery.appendChild(wrapper);
+    gallery.appendChild(item);
   });
 }
 
-// Load gallery
+function openLightbox(file) {
+  const lightbox = document.getElementById("lightbox");
+  const content = document.getElementById("lightbox-content");
+  const downloadBtn = document.getElementById("download-btn");
+
+  lightbox.classList.remove("hidden");
+  content.innerHTML = "";
+
+  // ⭐ Videos only — Drive allows inline playback inside <video> on mobile
+  const video = document.createElement("video");
+  video.src = `https://drive.google.com/uc?export=download&id=${file.id}`;
+  video.controls = true;
+  video.autoplay = false;
+  content.appendChild(video);
+
+  // Download button works for both images & videos
+  downloadBtn.href = file.webContentLink;
+}
+
+document.getElementById("lightbox-close").onclick = () => {
+  document.getElementById("lightbox").classList.add("hidden");
+};
 loadDriveFiles();
