@@ -11,26 +11,44 @@ async function loadDriveFiles() {
   const gallery = document.getElementById("galleryGrid");
 
   data.files.forEach(file => {
-    const isVideo = file.mimeType.startsWith("video") || file.name.match(/\.(mp4|mov|m4v|avi|webm)$/i);
+    // ⭐ Reliable video detection
+    const isVideo =
+      file.mimeType.startsWith("video") ||
+      file.name.match(/\.(mp4|mov|m4v|avi|webm)$/i);
+
     const thumb = file.thumbnailLink || file.webContentLink;
 
+    // Thumbnail image
     const item = document.createElement("img");
     item.src = thumb;
+    item.loading = "lazy"; // ⭐ Lazy loading
     item.className = "gallery-item";
 
-    // ⭐ HYBRID OPTION C:
-    // Images → open in new tab
-    // Videos → open in lightbox
+    // ⭐ Hybrid click behavior
     item.onclick = () => {
       if (isVideo) {
-        openLightbox(file);   // videos play inline on mobile
+        openLightbox(file); // videos play inline
       } else {
         const url = `https://drive.google.com/uc?export=view&id=${file.id}`;
-        window.open(url, "_blank");   // images open fast in new tab
+        window.open(url, "_blank"); // images open fast in new tab
       }
     };
 
-    gallery.appendChild(item);
+    // ⭐ Add video badge overlay
+    if (isVideo) {
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+
+      const badge = document.createElement("div");
+      badge.className = "video-badge";
+      badge.textContent = "▶ Play Video";
+
+      wrapper.appendChild(item);
+      wrapper.appendChild(badge);
+      gallery.appendChild(wrapper);
+    } else {
+      gallery.appendChild(item);
+    }
   });
 }
 
@@ -42,18 +60,19 @@ function openLightbox(file) {
   lightbox.classList.remove("hidden");
   content.innerHTML = "";
 
-  // ⭐ Videos only — Drive allows inline playback inside <video> on mobile
+  // ⭐ Videos only — Drive allows inline playback inside <video>
   const video = document.createElement("video");
   video.src = `https://drive.google.com/uc?export=download&id=${file.id}`;
   video.controls = true;
   video.autoplay = false;
   content.appendChild(video);
 
-  // Download button works for both images & videos
+  // Download button
   downloadBtn.href = file.webContentLink;
 }
 
 document.getElementById("lightbox-close").onclick = () => {
   document.getElementById("lightbox").classList.add("hidden");
 };
+
 loadDriveFiles();
