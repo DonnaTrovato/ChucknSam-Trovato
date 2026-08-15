@@ -33,21 +33,23 @@ function openLightbox(file) {
 
   const isVideo = file.mimeType.includes("video");
 
+  // Build a direct-view URL manually
+  const directViewURL = `https://drive.google.com/uc?export=view&id=${file.id}`;
+  const directDownloadURL = `https://drive.google.com/uc?export=download&id=${file.id}`;
+
   if (isVideo) {
     const video = document.createElement("video");
-    video.src = file.webViewLink || `https://drive.google.com/uc?export=download&id=${file.id}`;
+    video.src = directDownloadURL;
     video.controls = true;
     content.appendChild(video);
   } else {
     const img = document.createElement("img");
-    img.src = file.webViewLink || `https://drive.google.com/uc?export=view&id=${file.id}`;
-
+    img.src = directViewURL;
     content.appendChild(img);
   }
 
   downloadBtn.href = file.webContentLink;
 }
-
 
 
 document.getElementById("lightbox-close").onclick = () => {
