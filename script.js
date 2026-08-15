@@ -12,48 +12,27 @@ async function loadDriveFiles() {
 
   data.files.forEach(file => {
     const isVideo = file.mimeType.includes("video");
+
+    // Thumbnail fallback
     const thumb = file.thumbnailLink || file.webContentLink;
 
+    // Create gallery item
     const item = document.createElement("img");
     item.src = thumb;
     item.className = "gallery-item";
 
-    item.onclick = () => openLightbox(file);
+    // Open file in new tab
+    item.onclick = () => {
+      const url = isVideo
+        ? `https://drive.google.com/uc?export=download&id=${file.id}`
+        : `https://drive.google.com/uc?export=view&id=${file.id}`;
+
+      window.open(url, "_blank");
+    };
 
     gallery.appendChild(item);
   });
 }
-function openLightbox(file) {
-  const lightbox = document.getElementById("lightbox");
-  const content = document.getElementById("lightbox-content");
-  const downloadBtn = document.getElementById("download-btn");
 
-  lightbox.classList.remove("hidden");
-  content.innerHTML = "";
-
-  const isVideo = file.mimeType.includes("video");
-
-  // Build a direct-view URL manually
-  const directViewURL = `https://drive.google.com/uc?export=view&id=${file.id}`;
-  const directDownloadURL = `https://drive.google.com/uc?export=download&id=${file.id}`;
-
-  if (isVideo) {
-    const video = document.createElement("video");
-    video.src = directDownloadURL;
-    video.controls = true;
-    content.appendChild(video);
-  } else {
-    const img = document.createElement("img");
-    img.src = directViewURL;
-    content.appendChild(img);
-  }
-
-  downloadBtn.href = file.webContentLink;
-}
-
-
-document.getElementById("lightbox-close").onclick = () => {
-  document.getElementById("lightbox").classList.add("hidden");
-};
-
+// Load gallery on page load
 loadDriveFiles();
