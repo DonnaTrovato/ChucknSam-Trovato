@@ -16,12 +16,16 @@ async function loadDriveFiles() {
     // Thumbnail fallback
     const thumb = file.thumbnailLink || file.webContentLink;
 
-    // Create gallery item
+    // Wrapper for each gallery item
+    const wrapper = document.createElement("div");
+    wrapper.className = "gallery-item-wrapper";
+
+    // Thumbnail image
     const item = document.createElement("img");
     item.src = thumb;
     item.className = "gallery-item";
 
-    // Open file in new tab
+    // Click to open file
     item.onclick = () => {
       const url = isVideo
         ? `https://drive.google.com/uc?export=download&id=${file.id}`
@@ -30,9 +34,19 @@ async function loadDriveFiles() {
       window.open(url, "_blank");
     };
 
-    gallery.appendChild(item);
+    // Download button
+    const downloadBtn = document.createElement("a");
+    downloadBtn.className = "download-btn";
+    downloadBtn.innerText = "Download";
+    downloadBtn.href = `https://drive.google.com/uc?export=download&id=${file.id}`;
+    downloadBtn.target = "_blank";
+
+    // Build item
+    wrapper.appendChild(item);
+    wrapper.appendChild(downloadBtn);
+    gallery.appendChild(wrapper);
   });
 }
 
-// Load gallery on page load
+// Load gallery
 loadDriveFiles();
