@@ -1,207 +1,67 @@
-:root {
-  --bg: #f5f5f7;
-  --card-bg: #ffffff;
-  --text-main: #111111;
-  --text-muted: #666666;
-  --accent: #0070f3;
-  --border: #e0e0e0;
-  --radius: 12px;
-}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Wedding Gallery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css?v=2" />
+  </head>
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+  <body>
+    <header class="site-header">
+      <h1>Wedding Photo & Video Gallery</h1>
+      <p>
+        Thank you for celebrating with us. View, download, and share your own
+        memories.
+      </p>
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--bg);
-  color: var(--text-main);
-}
+      <div class="header-buttons">
+        <a href="#gallery" class="btn primary">View Gallery</a>
+        <a href="#upload" class="btn">Upload Your Photos</a>
+      </div>
+    </header>
 
-/* Header */
+    <main>
+      <!-- Gallery -->
+      <section id="gallery" class="gallery-section">
+        <h2>Gallery</h2>
 
-.site-header {
-  padding: 40px 20px 30px;
-  text-align: center;
-  background: linear-gradient(135deg, #ffffff, #f0f4ff);
-  border-bottom: 1px solid var(--border);
-}
+        <!-- Thumbnails injected by JS -->
+        <div id="galleryGrid" class="gallery-grid"></div>
 
-.site-header h1 {
-  margin: 0 0 10px;
-  font-size: 2rem;
-}
+        <!-- Lightbox (videos only in Hybrid Option C) -->
+        <div id="lightbox" class="lightbox hidden">
+          <button id="lightbox-close" class="lightbox-close">×</button>
 
-.site-header p {
-  margin: 0 0 20px;
-  color: var(--text-muted);
-}
+          <div id="lightbox-content"></div>
 
-.header-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
+          <a id="download-btn" class="download-btn" target="_blank">Download</a>
+        </div>
+      </section>
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: #ffffff;
-  color: var(--text-main);
-  text-decoration: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
-}
+      <!-- Upload section -->
+      <section id="upload" class="upload-section">
+        <h2>Share Your Photos & Videos</h2>
+        <p>
+          To add your own photos and videos, please use our upload link below.
+          You can drag and drop files from your phone or computer.
+        </p>
 
-.btn.primary {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
-}
+        <a
+          href="https://www.dropbox.com/request/sg2toxixj7eka6w6zjvi"
+          class="btn primary"
+          target="_blank"
+          rel="noopener"
+        >
+          Upload Photos & Videos
+        </a>
 
-.btn:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);
-}
+        <p class="hint">
+          Once we receive your files, we’ll add them to this gallery.
+        </p>
+      </section>
+    </main>
 
-/* Layout */
-
-main {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-section {
-  margin-bottom: 40px;
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
-}
-
-section h2 {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
-.hint {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-/* -------------------------------------- */
-/* ⭐ GALLERY */
-/* -------------------------------------- */
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
-  margin-top: 15px;
-}
-
-.gallery-item {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  cursor: pointer;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #000;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.gallery-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-/* -------------------------------------- */
-/* ⭐ LIGHTBOX (VIDEOS ONLY) */
-/* -------------------------------------- */
-
-.lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  z-index: 1000;
-}
-
-.lightbox.hidden {
-  display: none;
-}
-
-.lightbox-content {
-  max-width: 90%;
-  max-height: 70vh;
-  background: #000;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.lightbox-content video {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.lightbox-close {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 40px;
-  color: white;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.download-btn {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: #ffffff;
-  color: #000;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
-  display: inline-block;
-  text-align: center;
-}
-
-/* -------------------------------------- */
-/* Request form */
-/* -------------------------------------- */
-
-.request-form {
-  display: grid;
-  gap: 12px;
-}
-
-.request-form label {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.9rem;
-}
-
-.request-form input,
-.request-form textarea {
-  margin-top: 4px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  font: inherit;
-}
+    <script src="script.js"></script>
+  </body>
+</html>
