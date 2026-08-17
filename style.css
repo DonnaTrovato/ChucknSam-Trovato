@@ -1,67 +1,355 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Wedding Gallery</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="style.css?v=2" />
-  </head>
+/* ---------- Design tokens ---------- */
+:root {
+  --color-bg: #faf7f2;
+  --color-surface: #ffffff;
+  --color-text: #2e2b28;
+  --color-text-soft: #6b655d;
+  --color-accent: #6b7d5d;
+  --color-accent-dark: #4f5e44;
+  --color-accent-soft: #e7ebdd;
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+}
 
-  <body>
-    <header class="site-header">
-      <h1>Wedding Photo & Video Gallery</h1>
-      <p>
-        Thank you for celebrating with us. View, download, and share your own
-        memories.
-      </p>
+* {
+  box-sizing: border-box;
+}
 
-      <div class="header-buttons">
-        <a href="#gallery" class="btn primary">View Gallery</a>
-        <a href="#upload" class="btn">Upload Your Photos</a>
-      </div>
-    </header>
+html {
+  scroll-behavior: smooth;
+}
 
-    <main>
-      <!-- Gallery -->
-      <section id="gallery" class="gallery-section">
-        <h2>Gallery</h2>
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  line-height: 1.55;
+}
 
-        <!-- Thumbnails injected by JS -->
-        <div id="galleryGrid" class="gallery-grid"></div>
+body.lightbox-open {
+  overflow: hidden;
+}
 
-        <!-- Lightbox (videos only in Hybrid Option C) -->
-        <div id="lightbox" class="lightbox hidden">
-          <button id="lightbox-close" class="lightbox-close">×</button>
+h1,
+h2 {
+  font-family: var(--font-heading);
+  margin: 0 0 0.4em;
+}
 
-          <div id="lightbox-content"></div>
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
 
-          <a id="download-btn" class="download-btn" target="_blank">Download</a>
-        </div>
-      </section>
+.btn:active {
+  transform: scale(0.97);
+}
 
-      <!-- Upload section -->
-      <section id="upload" class="upload-section">
-        <h2>Share Your Photos & Videos</h2>
-        <p>
-          To add your own photos and videos, please use our upload link below.
-          You can drag and drop files from your phone or computer.
-        </p>
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+}
 
-        <a
-          href="https://www.dropbox.com/request/sg2toxixj7eka6w6zjvi"
-          class="btn primary"
-          target="_blank"
-          rel="noopener"
-        >
-          Upload Photos & Videos
-        </a>
+.btn-primary:hover {
+  background: var(--color-accent-dark);
+}
 
-        <p class="hint">
-          Once we receive your files, we’ll add them to this gallery.
-        </p>
-      </section>
-    </main>
+.btn-outline {
+  background: transparent;
+  color: var(--color-accent-dark);
+  border-color: var(--color-accent);
+}
 
-    <script src="script.js"></script>
-  </body>
-</html>
+.btn-outline:hover {
+  background: var(--color-accent-soft);
+}
+
+.btn-large {
+  padding: 1rem 2.2rem;
+  font-size: 1.05rem;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  background: linear-gradient(180deg, var(--color-accent-soft), var(--color-bg));
+  text-align: center;
+  padding: 4.5rem 1.5rem 3.5rem;
+}
+
+.hero-inner {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  color: var(--color-accent-dark);
+}
+
+.tagline {
+  color: var(--color-text-soft);
+  font-size: 1.05rem;
+  margin-bottom: 1.8rem;
+}
+
+.hero-nav {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ---------- Sections ---------- */
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.gallery-section,
+.upload-section {
+  padding: 3rem 0;
+}
+
+.gallery-section h2,
+.upload-card h2 {
+  text-align: center;
+  color: var(--color-accent-dark);
+  font-size: 2rem;
+}
+
+.section-sub {
+  text-align: center;
+  color: var(--color-text-soft);
+  margin-bottom: 2rem;
+}
+
+.gallery-status {
+  text-align: center;
+  color: var(--color-text-soft);
+  padding: 2rem 0;
+}
+
+/* ---------- Gallery grid ---------- */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+@media (min-width: 640px) {
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 18px;
+  }
+}
+
+.gallery-item {
+  margin: 0;
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.thumb:hover img,
+.thumb:focus-visible img {
+  transform: scale(1.05);
+}
+
+.play-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  pointer-events: none;
+}
+
+.download-link {
+  display: block;
+  text-align: center;
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-accent-dark);
+  text-decoration: none;
+}
+
+.download-link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Upload section ---------- */
+.upload-card {
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.upload-card .btn {
+  margin: 1rem 0;
+}
+
+.hint {
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  text-align: center;
+  padding: 2.5rem 1rem 3rem;
+  color: var(--color-text-soft);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 18, 16, 0.94);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox-content {
+  max-width: min(92vw, 1100px);
+  max-height: 78vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-media {
+  max-width: 100%;
+  max-height: 78vh;
+  border-radius: 8px;
+  border: none;
+  display: block;
+}
+
+iframe.lightbox-media {
+  width: min(92vw, 900px);
+  height: min(60vh, 500px);
+}
+
+.lightbox-close,
+.lightbox-nav {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.lightbox-close:hover,
+.lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.lightbox-close {
+  top: 1rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.lightbox-nav {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+}
+
+.lightbox-prev {
+  left: 1rem;
+}
+
+.lightbox-next {
+  right: 1rem;
+}
+
+.lightbox-download {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 640px) {
+  .lightbox-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .lightbox-content {
+    max-height: 68vh;
+  }
+
+  .lightbox-media,
+  iframe.lightbox-media {
+    max-height: 68vh;
+    width: 92vw;
+  }
+}

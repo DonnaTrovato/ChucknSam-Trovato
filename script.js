@@ -1,78 +1,207 @@
 const API_KEY = "AIzaSyCRadR3Kb12_d-SVAnrwlgd7_Q-fnsE4nc";
 const FOLDER_ID = "1WDhCqyQKCMtg-Y9RRWca6Z1VS-USCCmq";
 
-async function loadDriveFiles() {
-  const url =
-    `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType,thumbnailLink,webContentLink)`;
+const state = {
+  items: [],
+  currentIndex: -1,
+};
 
-  const response = await fetch(url);
-  const data = await response.json();
+// ---------- Data loading ----------
 
-  const gallery = document.getElementById("galleryGrid");
+async function fetchAllFiles() {
+  let files = [];
+  let pageToken = null;
 
-  data.files.forEach(file => {
-    // ⭐ Reliable video detection
-    const isVideo =
-      file.mimeType.startsWith("video") ||
-      file.name.match(/\.(mp4|mov|m4v|avi|webm)$/i);
+  do {
+    const url = new URL("https://www.googleapis.com/drive/v3/files");
+    url.searchParams.set("q", `'${FOLDER_ID}' in parents and trashed = false`);
+    url.searchParams.set("key", API_KEY);
+    url.searchParams.set(
+      "fields",
+      "nextPageToken, files(id,name,mimeType,webContentLink,createdTime)"
+    );
+    url.searchParams.set("pageSize", "100");
+    url.searchParams.set("orderBy", "createdTime desc");
+    if (pageToken) url.searchParams.set("pageToken", pageToken);
 
-    const thumb = file.thumbnailLink || file.webContentLink;
-
-    // Thumbnail image
-    const item = document.createElement("img");
-    item.src = thumb;
-    item.loading = "lazy"; // ⭐ Lazy loading
-    item.className = "gallery-item";
-
-    // ⭐ Hybrid click behavior
-    item.onclick = () => {
-      if (isVideo) {
-        openLightbox(file); // videos play inline
-      } else {
-        const url = `https://drive.google.com/uc?export=view&id=${file.id}`;
-        window.open(url, "_blank"); // images open fast in new tab
-      }
-    };
-
-    // ⭐ Add video badge overlay
-    if (isVideo) {
-      const wrapper = document.createElement("div");
-      wrapper.style.position = "relative";
-
-      const badge = document.createElement("div");
-      badge.className = "video-badge";
-      badge.textContent = "▶ Play Video";
-
-      wrapper.appendChild(item);
-      wrapper.appendChild(badge);
-      gallery.appendChild(wrapper);
-    } else {
-      gallery.appendChild(item);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Drive API error: ${response.status}`);
     }
+    const data = await response.json();
+    files = files.concat(data.files || []);
+    pageToken = data.nextPageToken || null;
+  } while (pageToken);
+
+  return files;
+}
+
+function isVideoFile(file) {
+  return (
+    file.mimeType.startsWith("video/") ||
+    /\.(mp4|mov|m4v|avi|webm)$/i.test(file.name)
+  );
+}
+
+function driveThumbUrl(id, size) {
+  return `https://drive.google.com/thumbnail?id=${id}&sz=w${size}`;
+}
+
+function buildItem(file) {
+  return {
+    id: file.id,
+    name: file.name,
+    isVideo: isVideoFile(file),
+    gridThumb: driveThumbUrl(file.id, 500),
+    largeThumb: driveThumbUrl(file.id, 1600),
+    embedUrl: `https://drive.google.com/file/d/${file.id}/preview`,
+    downloadUrl:
+      file.webContentLink ||
+      `https://drive.google.com/uc?export=download&id=${file.id}`,
+  };
+}
+
+// ---------- Rendering ----------
+
+function renderGallery(items) {
+  const grid = document.getElementById("galleryGrid");
+  const status = document.getElementById("galleryStatus");
+  grid.innerHTML = "";
+
+  if (!items.length) {
+    status.textContent = "No photos or videos yet — be the first to share!";
+    return;
+  }
+
+  status.hidden = true;
+  grid.hidden = false;
+
+  items.forEach((item, index) => {
+    const figure = document.createElement("figure");
+    figure.className = "gallery-item";
+
+    const thumbBtn = document.createElement("button");
+    thumbBtn.type = "button";
+    thumbBtn.className = "thumb";
+    thumbBtn.setAttribute(
+      "aria-label",
+      item.isVideo ? "Play video" : "View photo"
+    );
+    thumbBtn.addEventListener("click", () => openLightbox(index));
+
+    const img = document.createElement("img");
+    img.src = item.gridThumb;
+    img.loading = "lazy";
+    img.alt = item.isVideo ? "Wedding video thumbnail" : "Wedding photo";
+    img.onerror = () => {
+      img.onerror = null;
+      img.src = item.downloadUrl;
+    };
+    thumbBtn.appendChild(img);
+
+    if (item.isVideo) {
+      const badge = document.createElement("span");
+      badge.className = "play-badge";
+      badge.setAttribute("aria-hidden", "true");
+      badge.textContent = "▶";
+      thumbBtn.appendChild(badge);
+    }
+
+    const downloadLink = document.createElement("a");
+    downloadLink.className = "download-link";
+    downloadLink.href = item.downloadUrl;
+    downloadLink.target = "_blank";
+    downloadLink.rel = "noopener";
+    downloadLink.textContent = "⬇ Download";
+
+    figure.appendChild(thumbBtn);
+    figure.appendChild(downloadLink);
+    grid.appendChild(figure);
   });
 }
 
-function openLightbox(file) {
-  const lightbox = document.getElementById("lightbox");
-  const content = document.getElementById("lightbox-content");
-  const downloadBtn = document.getElementById("download-btn");
+// ---------- Lightbox ----------
 
-  lightbox.classList.remove("hidden");
+function openLightbox(index) {
+  state.currentIndex = index;
+  const item = state.items[index];
+  const lightbox = document.getElementById("lightbox");
+  const content = document.getElementById("lightboxContent");
+  const downloadBtn = document.getElementById("lightboxDownload");
+
   content.innerHTML = "";
 
-  // ⭐ Videos only — Drive allows inline playback inside <video>
-  const video = document.createElement("video");
-  video.src = `https://drive.google.com/uc?export=download&id=${file.id}`;
-  video.controls = true;
-  video.autoplay = false;
-  content.appendChild(video);
+  if (item.isVideo) {
+    const iframe = document.createElement("iframe");
+    iframe.src = item.embedUrl;
+    iframe.className = "lightbox-media";
+    iframe.allow = "autoplay; fullscreen";
+    iframe.allowFullscreen = true;
+    content.appendChild(iframe);
+  } else {
+    const img = document.createElement("img");
+    img.src = item.largeThumb;
+    img.alt = item.name;
+    img.className = "lightbox-media";
+    img.onerror = () => {
+      img.onerror = null;
+      img.src = item.downloadUrl;
+    };
+    content.appendChild(img);
+  }
 
-  // Download button
-  downloadBtn.href = file.webContentLink;
+  downloadBtn.href = item.downloadUrl;
+  lightbox.hidden = false;
+  document.body.classList.add("lightbox-open");
 }
 
-document.getElementById("lightbox-close").onclick = () => {
-  document.getElementById("lightbox").classList.add("hidden");
-};
+function closeLightbox() {
+  document.getElementById("lightbox").hidden = true;
+  document.getElementById("lightboxContent").innerHTML = "";
+  document.body.classList.remove("lightbox-open");
+  state.currentIndex = -1;
+}
 
-loadDriveFiles();
+function showRelative(offset) {
+  if (state.currentIndex === -1 || !state.items.length) return;
+  const next =
+    (state.currentIndex + offset + state.items.length) % state.items.length;
+  openLightbox(next);
+}
+
+document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
+document
+  .getElementById("lightboxPrev")
+  .addEventListener("click", () => showRelative(-1));
+document
+  .getElementById("lightboxNext")
+  .addEventListener("click", () => showRelative(1));
+
+// Click on the dark backdrop (not the media itself) closes the lightbox
+document.getElementById("lightbox").addEventListener("click", (event) => {
+  if (event.target.id === "lightbox") closeLightbox();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (document.getElementById("lightbox").hidden) return;
+  if (event.key === "Escape") closeLightbox();
+  if (event.key === "ArrowLeft") showRelative(-1);
+  if (event.key === "ArrowRight") showRelative(1);
+});
+
+// ---------- Init ----------
+
+async function init() {
+  const status = document.getElementById("galleryStatus");
+  try {
+    const files = await fetchAllFiles();
+    state.items = files.map(buildItem);
+    renderGallery(state.items);
+  } catch (error) {
+    console.error(error);
+    status.textContent =
+      "We couldn't load the gallery right now. Please refresh or try again later.";
+  }
+}
+
+init();

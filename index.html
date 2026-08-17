@@ -2,65 +2,105 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Wedding Gallery</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="style.css?v=2" />
+    <title>Charlie &amp; Sam — Wedding Gallery</title>
+    <meta
+      name="description"
+      content="Photos and videos from Charlie & Sam's wedding — browse, download, and share your own."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css?v=3" />
   </head>
 
   <body>
-    <header class="site-header">
-      <h1>Wedding Photo & Video Gallery</h1>
-      <p>
-        Thank you for celebrating with us. View, download, and share your own
-        memories.
-      </p>
-
-      <div class="header-buttons">
-        <a href="#gallery" class="btn primary">View Gallery</a>
-        <a href="#upload" class="btn">Upload Your Photos</a>
+    <header class="hero">
+      <div class="hero-inner">
+        <h1>Charlie &amp; Sam</h1>
+        <p class="tagline">
+          Thank you for celebrating with us! Browse, download, and share your
+          favorite moments below.
+        </p>
+        <nav class="hero-nav">
+          <a href="#gallery" class="btn btn-primary">View Gallery</a>
+          <a href="#upload" class="btn btn-outline">Share Your Photos</a>
+        </nav>
       </div>
     </header>
 
     <main>
-      <!-- Gallery -->
       <section id="gallery" class="gallery-section">
-        <h2>Gallery</h2>
+        <h2>The Gallery</h2>
+        <p class="section-sub">Tap any photo or video to view it full-size.</p>
 
-        <!-- Thumbnails injected by JS -->
-        <div id="galleryGrid" class="gallery-grid"></div>
+        <p id="galleryStatus" class="gallery-status">
+          Loading photos &amp; videos…
+        </p>
+        <div id="galleryGrid" class="gallery-grid" hidden></div>
+      </section>
 
-        <!-- Lightbox (videos only in Hybrid Option C) -->
-        <div id="lightbox" class="lightbox hidden">
-          <button id="lightbox-close" class="lightbox-close">×</button>
-
-          <div id="lightbox-content"></div>
-
-          <a id="download-btn" class="download-btn" target="_blank">Download</a>
+      <section id="upload" class="upload-section">
+        <div class="upload-card">
+          <h2>Share Your Photos &amp; Videos</h2>
+          <p>
+            Have pictures or clips from the wedding? We'd love to see them!
+            Tap below to upload straight from your phone or computer — no
+            account needed.
+          </p>
+          <a
+            href="https://www.dropbox.com/request/sg2toxixj7eka6w6zjvi"
+            class="btn btn-primary btn-large"
+            target="_blank"
+            rel="noopener"
+          >
+            Upload Photos &amp; Videos
+          </a>
+          <p class="hint">
+            Once we receive your files, we'll add our favorites to the
+            gallery above.
+          </p>
         </div>
       </section>
-
-      <!-- Upload section -->
-      <section id="upload" class="upload-section">
-        <h2>Share Your Photos & Videos</h2>
-        <p>
-          To add your own photos and videos, please use our upload link below.
-          You can drag and drop files from your phone or computer.
-        </p>
-
-        <a
-          href="https://www.dropbox.com/request/sg2toxixj7eka6w6zjvi"
-          class="btn primary"
-          target="_blank"
-          rel="noopener"
-        >
-          Upload Photos & Videos
-        </a>
-
-        <p class="hint">
-          Once we receive your files, we’ll add them to this gallery.
-        </p>
-      </section>
     </main>
+
+    <footer class="site-footer">
+      <p>With love, Charlie &amp; Sam 💛</p>
+    </footer>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" hidden>
+      <button id="lightboxClose" class="lightbox-close" aria-label="Close">
+        &times;
+      </button>
+      <button
+        id="lightboxPrev"
+        class="lightbox-nav lightbox-prev"
+        aria-label="Previous"
+      >
+        &#10094;
+      </button>
+      <button
+        id="lightboxNext"
+        class="lightbox-nav lightbox-next"
+        aria-label="Next"
+      >
+        &#10095;
+      </button>
+      <div id="lightboxContent" class="lightbox-content"></div>
+      <a
+        id="lightboxDownload"
+        class="btn btn-primary lightbox-download"
+        target="_blank"
+        rel="noopener"
+      >
+        ⬇ Download
+      </a>
+    </div>
 
     <script src="script.js"></script>
   </body>
