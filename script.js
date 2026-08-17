@@ -21,7 +21,7 @@ async function fetchAllFiles() {
       "nextPageToken, files(id,name,mimeType,webContentLink,createdTime)"
     );
     url.searchParams.set("pageSize", "100");
-    url.searchParams.set("orderBy", "createdTime desc");
+    url.searchParams.set("orderBy", "name_natural");
     if (pageToken) url.searchParams.set("pageToken", pageToken);
 
     const response = await fetch(url);
