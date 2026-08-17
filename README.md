@@ -77,6 +77,14 @@ allowed pattern. To test changes before pushing, either:
 - Free Google account storage (15 GB, shared with Gmail/Photos) can fill up
   faster than expected with guest-uploaded videos — worth checking Drive
   storage occasionally as more files come in.
+- The Dropbox File Request (free plan) caps *received* storage at 2GB
+  total, cumulative until cleared. Moving reviewed files into Drive does
+  **not** free that space — the originals also need to be deleted from
+  Dropbox once they're safely copied over. If guests upload enough to hit
+  the cap, a free fallback is a Google Form with a file-upload question
+  pointed at the Drive folder (draws from the 15GB Google quota instead),
+  though it requires guests to sign into a Google account to upload, unlike
+  Dropbox's no-account file request.
 - The Drive API returns up to 100 files per request; `fetchAllFiles()`
   already pages through additional results automatically, so this isn't a
   practical limit.
