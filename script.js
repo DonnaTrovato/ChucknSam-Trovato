@@ -55,6 +55,7 @@ function buildItem(file) {
     gridThumb: driveThumbUrl(file.id, 500),
     largeThumb: driveThumbUrl(file.id, 1600),
     embedUrl: `https://drive.google.com/file/d/${file.id}/preview`,
+    videoSrc: `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${API_KEY}`,
     downloadUrl:
       file.webContentLink ||
       `https://drive.google.com/uc?export=download&id=${file.id}`,
@@ -132,12 +133,37 @@ function openLightbox(index) {
   content.innerHTML = "";
 
   if (item.isVideo) {
-    const iframe = document.createElement("iframe");
-    iframe.src = item.embedUrl;
-    iframe.className = "lightbox-media";
-    iframe.allow = "autoplay; fullscreen";
-    iframe.allowFullscreen = true;
-    content.appendChild(iframe);
+    // Use a native <video> element so play/pause, seek, fullscreen, and
+    // cast controls are rendered by the browser itself. Google's embedded
+    // preview (an iframe pointing at drive.google.com) draws its own
+    // control overlay inside a cross-origin page we can't restyle, and on
+    // small mobile screens that overlay's play/pause button ends up
+    // stacked on top of the fullscreen/cast buttons. Native controls avoid
+    // that entirely.
+    const video = document.createElement("video");
+    video.src = item.videoSrc;
+    video.controls = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+    video.poster = item.gridThumb;
+    video.className = "lightbox-media";
+    video.addEventListener(
+      "error",
+      () => {
+        // Fall back to Google's embedded preview if direct streaming
+        // fails (e.g. a very large file Drive won't serve without its
+        // virus-scan interstitial).
+        content.innerHTML = "";
+        const iframe = document.createElement("iframe");
+        iframe.src = item.embedUrl;
+        iframe.className = "lightbox-media";
+        iframe.allow = "autoplay; fullscreen";
+        iframe.allowFullscreen = true;
+        content.appendChild(iframe);
+      },
+      { once: true }
+    );
+    content.appendChild(video);
   } else {
     const img = document.createElement("img");
     img.src = item.largeThumb;
